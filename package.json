@@ -1,0 +1,27 @@
+{
+  "name": "codeguardian",
+  "version": "0.1.0",
+  "description": "CLI to scan repos for sensitive secrets before pushing",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "codeguardian": "src/cli.js"
+  },
+  "scripts": {
+    "scan": "node ./src/cli.js"
+  },
+  "keywords": [
+    "secrets",
+    "scanner",
+    "pre-commit",
+    "husky"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.0.0",
+    "fast-glob": "^3.3.2",
+    "ignore": "^5.2.0"
+  }
+}
