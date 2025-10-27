@@ -1,5 +1,5 @@
 {
-  "name": "@shivarm/codeguardian",
+  "name": "@shivam-sharma/codeguardian",
   "version": "1.0.0",
   "description": "CLI to scan repos for sensitive secrets before pushing",
   "main": "src/index.js",

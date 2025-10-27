@@ -11,13 +11,13 @@ Installation (two quick ways):
 - Run directly with npx (no install required):
 
 ```bash
-npx @shivarm/codeguardian
+npx @shivam-sharma/codeguardian
 ```
 
 - Install as a dev dependency (recommended for team projects):
 
 ```bash
-npm install --save-dev @shivarm/codeguardian
+npm install --save-dev @shivam-sharma/codeguardian
 ```
 
 Basic commands:
