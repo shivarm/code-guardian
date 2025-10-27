@@ -1,4 +1,17 @@
-# CodeGuardian — Sensitive Data Scanner
+<div align="center">
+
+ <span>
+    <h1>@shivam-sharma/codeguardian</h1>
+</span>
+
+<a href="https://github.com/shivarm/code-guardian/actions/workflows/codeguardian.yml/badge.svg"><img alt="Node.js CI" src="https://github.com/shivarm/code-guardian/actions/workflows/codeguardian.yml/badge.svg"></a>
+<a href="https://www.npmjs.com/package/@shivam-sharma/codeguardian"><img alt="npm version" src="https://img.shields.io/npm/v/@shivam-sharma/codeguardian"></a>
+<a href="./LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/shivarm/code-guardian"></a>
+<a href="https://github.com/shivarm/code-guardian/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/shivarm/code-guardian"></a>
+
+</div>
+
+ 
 
 Lightweight CLI to scan repositories for accidentally committed secrets (API keys, tokens, private keys). This short guide starts with how to use CodeGuardian in your project, how to integrate it into CI, and then explains the feature set and configuration.
 
