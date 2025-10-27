@@ -1,6 +1,6 @@
 {
-  "name": "codeguardian",
-  "version": "0.1.0",
+  "name": "@shivarm/codeguardian",
+  "version": "1.0.0",
   "description": "CLI to scan repos for sensitive secrets before pushing",
   "main": "src/index.js",
   "type": "module",
@@ -16,12 +16,26 @@
     "pre-commit",
     "husky"
   ],
-  "author": "",
+  "author": "Shivam Sharma <meshivam81@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shivarm/code-guardian.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shivarm/code-guardian/issues"
+  },
+  "homepage": "https://github.com/shivarm/code-guardian#readme",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "fast-glob": "^3.3.2",
     "ignore": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

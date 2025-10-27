@@ -1,81 +1,117 @@
 # CodeGuardian — Sensitive Data Scanner
 
-A small Node.js CLI that scans your repository for commonly leaked secrets before you push.
+Lightweight CLI to scan repositories for accidentally committed secrets (API keys, tokens, private keys). This short guide starts with how to use CodeGuardian in your project, how to integrate it into CI, and then explains the feature set and configuration.
 
-Features
-- CLI scanner using configurable regex rules
-- Sample Husky pre-commit hook
-- Optional CI mode (exit non-zero when findings are present)
+## How developers use CodeGuardian.
 
-Quick start
-1. Install dependencies:
+---
 
-```bash
-npm install
-```
+Installation (two quick ways):
 
-2. (Optional) Install husky hooks (manual steps)
-
-Note: this project no longer runs `husky install` automatically during `npm install` — the `prepare` script was removed to avoid install-time failures on machines that don't have Husky installed. If you want local pre-commit hooks, install and enable Husky manually:
+- Run directly with npx (no install required):
 
 ```bash
-# install husky as a dev dependency
-npm install --save-dev husky
-
-# install husky hooks into .husky/
-npx husky install
-
-# add a pre-commit hook that runs CodeGuardian on staged files and fails the commit
-npx husky add .husky/pre-commit "npx codeguardian --staged --ci"
+npx @shivarm/codeguardian
 ```
 
-3. Run the scanner on the repo:
+- Install as a dev dependency (recommended for team projects):
+
+```bash
+npm install --save-dev @shivarm/codeguardian
+```
+
+Basic commands:
+
+- Scan entire repository:
 
 ```bash
 npx codeguardian
 ```
 
-Config
-Drop a `.codeguardianrc.json` in the repo with the following shape:
+- Scan only staged files (fast; good for pre-commit hooks):
 
-```json
-{
-  "rules": [
-    { "name": "Example", "pattern": "AKIA[0-9A-Z]{16}", "flags": "g" }
-  ]
-}
+```bash
+npx codeguardian --staged
 ```
 
-You can also add an `ignoreFiles` array of globs or paths to skip scanning noisy files (for example lockfiles or build outputs). Example `.codeguardianrc.json`:
+- CI mode (exit non-zero on findings):
 
-```json
-{
-  "ignoreFiles": [
-    "package-lock.json",
-    "yarn.lock",
-    "pnpm-lock.yaml",
-    "dist/**",
-    "node_modules/**"
-  ],
-  "rules": [
-    { "name": "AWS Access Key ID", "pattern": "AKIA[0-9A-Z]{16}", "flags": "g" },
-    { "name": "Simple API key assignment", "pattern": "api_key\\s*[=:\\s]\\s*([A-Za-z0-9_\\-]{8,})", "flags": "gi" }
-  ]
-}
+```bash
+npx codeguardian --ci
 ```
 
-To run the scanner with a custom config file use `--config`:
+Custom config (optional):
 
 ```bash
 npx codeguardian --config .codeguardianrc.json
 ```
 
-CI Integration
-Run `npx codeguardian --ci` in your CI pipeline and fail the build if any findings are present.
+## How to integrate with CI (GitHub Actions).
 
-Notes
-Notes
-- The default ruleset (in `default-config.json`) is a starting point — tune it for your project to reduce false positives.
-- The scanner respects `.gitignore` and ignores `node_modules` and `.git` by default. Additionally, CodeGuardian now ignores common lockfiles by default (e.g. `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`) to reduce noisy matches from integrity/hash lines.
+---
 
-If you want to ignore additional files from scanning (beyond `.gitignore` and the default lockfiles), add them to your `.codeguardianrc.json`.
+Use the built-in workflow `.github/workflows/codeguardian.yml` or add a step to your pipeline to run the scanner in CI mode. Example snippet:
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  scan:
+    name: Run CodeGuardian
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run CodeGuardian scanner (CI mode)
+        run: npx codeguardian --ci
+```
+
+When run with `--ci` the CLI exits with a non-zero code if any findings are detected — this will fail the job and block merges until issues are resolved.
+
+## What CodeGuardian offers
+
+---
+
+- Rule-based scanning: configure regex rules (name, pattern, flags) to detect secrets.
+- `ignoreFiles`: glob list to skip noisy files (lockfiles, build artifacts).
+- Staged-file scanning: run only what will be committed (fast pre-commit checks).
+- Husky integration: optional pre-commit hooks to block commits locally.
+- CI-ready: `--ci` mode for failing pipelines on findings.
+
+## Developer guide & advanced configuration
+
+---
+
+## CLI options
+
+- `-c, --config <path>` — path to JSON config file (default: `.codeguardianrc.json`)
+- `-s, --staged` — only scan staged files
+- `--ci` — CI mode: exit non-zero when findings exist
+- `-v, --verbose` — verbose output
+
+## Config file (`.codeguardianrc.json`)
+
+Minimal shape:
+
+```json
+{
+  "ignoreFiles": ["package-lock.json", "yarn.lock", "dist/**"],
+  "rules": [{ "name": "AWS Access Key ID", "pattern": "AKIA[0-9A-Z]{16}", "flags": "g" }]
+}
+```
+
+Rules are JavaScript regular expressions expressed as strings. `flags` is optional (for example `gi`). The scanner will try to compile each rule. invalid patterns are skipped.
