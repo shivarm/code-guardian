@@ -11,9 +11,8 @@
 
 </div>
 
- 
 
-Lightweight CLI to scan repositories for accidentally committed secrets (API keys, tokens, private keys). This short guide starts with how to use CodeGuardian in your project, how to integrate it into CI, and then explains the feature set and configuration.
+Lightweight CLI to scan repositories for accidentally committed secrets (API keys, tokens, private keys). This short guide starts with how to use CodeGuardian in your project, how to integrate it into CI, and then explains the feature and configuration.
 
 ## How developers use CodeGuardian.
 
@@ -47,21 +46,33 @@ npx codeguardian
 npx codeguardian --staged
 ```
 
-- CI mode (exit non-zero on findings):
+## Adding scripts to package.json
+you can add a script to your `package.json` to simplify running the scanner:
 
-```bash
-npx codeguardian --ci
+```json
+  "scripts": {
+    "scan": "codeguardian"
+  } 
 ```
 
-Custom config (optional):
+## Default config:
+If no config is provided, CodeGuardian uses built-in rules to scan for common secrets (API keys, tokens, etc.).
 
-```bash
-npx codeguardian --config .codeguardianrc.json
+## Custom config:
+You can create a `.codeguardianrc.json` file to define your own regex rules and files to ignore:
+
+```json
+{
+  "ignoreFiles": ["package-lock.json", "dist/**"],
+  "rules": [
+    { "name": "AWS Key", "pattern": "AKIA[0-9A-Z]{16}", "flags": "g" }
+  ]
+}
 ```
+
+Rules are JavaScript regular expressions expressed as strings. `flags` is optional (for example `g`). The scanner will try to compile each rule. invalid patterns are skipped.
 
 ## How to integrate with CI (GitHub Actions).
-
----
 
 Use the built-in workflow `.github/workflows/codeguardian.yml` or add a step to your pipeline to run the scanner in CI mode. Example snippet:
 
@@ -105,9 +116,6 @@ When run with `--ci` the CLI exits with a non-zero code if any findings are dete
 - Husky integration: optional pre-commit hooks to block commits locally.
 - CI-ready: `--ci` mode for failing pipelines on findings.
 
-## Developer guide & advanced configuration
-
----
 
 ## CLI options
 
@@ -116,15 +124,3 @@ When run with `--ci` the CLI exits with a non-zero code if any findings are dete
 - `--ci` — CI mode: exit non-zero when findings exist
 - `-v, --verbose` — verbose output
 
-## Config file (`.codeguardianrc.json`)
-
-Minimal shape:
-
-```json
-{
-  "ignoreFiles": ["package-lock.json", "yarn.lock", "dist/**"],
-  "rules": [{ "name": "AWS Access Key ID", "pattern": "AKIA[0-9A-Z]{16}", "flags": "g" }]
-}
-```
-
-Rules are JavaScript regular expressions expressed as strings. `flags` is optional (for example `gi`). The scanner will try to compile each rule. invalid patterns are skipped.
