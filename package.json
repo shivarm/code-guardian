@@ -10,6 +10,11 @@
   "scripts": {
     "scan": "node ./src/cli.js"
   },
+  "files": [
+    "src/cli.js",
+    "LICENSE",
+    "REDME.md"
+  ],
   "keywords": [
     "secrets",
     "scanner",
