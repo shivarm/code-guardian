@@ -11,8 +11,8 @@
       "flags": "gi"
     },
     {
-      "name": "Generic API Key (20+ chars)",
-      "pattern": "[A-Za-z0-9_-]{20,}",
+      "name": "JWT",
+      "pattern": "eyJ[A-Za-z0-9\\-_]+\\.[A-Za-z0-9\\-_]+\\.[A-Za-z0-9\\-_]+",
       "flags": "g"
     },
     {
