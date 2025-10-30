@@ -11,9 +11,10 @@
     "scan": "node ./src/cli.js"
   },
   "files": [
-    "src/cli.js",
+    "src",
+    "default-config.json",
     "LICENSE",
-    "REDME.md"
+    "README.md"
   ],
   "keywords": [
     "secrets",
