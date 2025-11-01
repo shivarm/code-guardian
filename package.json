@@ -18,9 +18,11 @@
   ],
   "keywords": [
     "secrets",
-    "scanner",
-    "pre-commit",
-    "husky"
+    "jwt",
+    "aws",
+    "api",
+    "key",
+    "scanner"
   ],
   "author": "Shivam Sharma <meshivam81@gmail.com>",
   "repository": {
