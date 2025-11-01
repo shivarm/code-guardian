@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import path from 'path';
 import scanner from './scanner.js';
+import chalk from 'chalk';
 
 const program = new Command();
 program
@@ -13,6 +14,15 @@ program
   .option('-v, --verbose', 'verbose output')
   .option('--ci', 'CI mode: exit non-zero on findings and produce machine-friendly output')
   .parse(process.argv);
+
+const logo = `
+
+█▀▀ █▀█ █▀▄ █▀▀ █▀▀ █░█ ▄▀█ █▀█ █▀▄ █ ▄▀█ █▄░█
+█▄▄ █▄█ █▄▀ ██▄ █▄█ █▄█ █▀█ █▀▄ █▄▀ █ █▀█ █░▀█
+
+`;
+
+console.log(chalk.magenta(logo));
 
 (async () => {
   const opts = program.opts();
