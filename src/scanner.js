@@ -117,7 +117,7 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
 
   // Print nice output
   if (findings.length === 0) {
-    console.log(chalk.green('No secrets found.'));
+    console.log(chalk.green('Scan successful but no secrets found in.', process.cwd()));
   } else {
     console.log(chalk.red(`Found ${findings.length} file(s) with potential secrets:`));
     for (const f of findings) {
