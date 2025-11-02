@@ -32,8 +32,8 @@
     },
     {
       "name": "Azure Storage Account Key",
-      "pattern": "[A-Za-z0-9+/]{88}==",
-      "flags": "g"
+      "pattern": "(AccountKey\\s*[:=]\\s*)[A-Za-z0-9+/]{88}==",
+      "flags": "gi"
     },
     {
       "name": "Google Cloud API Key",
