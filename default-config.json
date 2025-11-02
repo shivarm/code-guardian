@@ -29,6 +29,16 @@
       "name": "Heroku API key",
       "pattern": "heroku\\s*[:=]\\s*[0-9a-fA-F]{32}",
       "flags": "gi"
+    },
+    {
+      "name": "Azure Storage Account Key",
+      "pattern": "[A-Za-z0-9+/]{88}==",
+      "flags": "g"
+    },
+    {
+      "name": "Google Cloud API Key",
+      "pattern": "AIza[0-9A-Za-z\\-_]{35}",
+      "flags": "g"
     }
   ]
 }
