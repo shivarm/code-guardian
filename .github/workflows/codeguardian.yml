@@ -27,4 +27,4 @@ jobs:
         run: npm ci
 
       - name: Run CodeGuardian scanner (CI mode)
-        run: npx codeguardian --ci
+        run: node src/cli.js --ci
