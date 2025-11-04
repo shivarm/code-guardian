@@ -10,6 +10,9 @@ jobs:
   scan:
     name: Run CodeGuardian
     runs-on: ubuntu-latest
+    strategy:
+     matrix:
+      node-version: [20, 22, 24, 25] 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -17,11 +20,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run CodeGuardian scanner (CI mode)
-        run: npx codeguardian --ci
+        run: node src/cli.js --ci
