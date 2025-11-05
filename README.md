@@ -46,15 +46,6 @@ npx codeguardian
 npx codeguardian --staged
 ```
 
-## Adding scripts to package.json
-you can add a script to your `package.json` to simplify running the scanner:
-
-```json
-  "scripts": {
-    "scan": "codeguardian"
-  } 
-```
-
 ## Default config:
 If no config is provided, CodeGuardian uses built-in rules to scan for common secrets (API keys, tokens, etc.).
 
@@ -111,6 +102,8 @@ When run with `--ci` the CLI exits with a non-zero code if any findings are dete
 ---
 
 - Rule-based scanning: configure regex rules (name, pattern, flags) to detect secrets.
+- Built-in detection for AWS, Azure, Google Cloud, Heroku, JWTs, Slack tokens, and more.
+- Scan performance stats: see time taken, memory usage, and file count at the end of each run.
 - `ignoreFiles`: glob list to skip noisy files (lockfiles, build artifacts).
 - Staged-file scanning: run only what will be committed (fast pre-commit checks).
 - Husky integration: optional pre-commit hooks to block commits locally.
@@ -124,3 +117,11 @@ When run with `--ci` the CLI exits with a non-zero code if any findings are dete
 - `--ci` — CI mode: exit non-zero when findings exist
 - `-v, --verbose` — verbose output
 
+## Adding scripts to package.json
+you can add a script to your `package.json` to simplify running the scanner:
+
+```json
+  "scripts": {
+    "scan": "codeguardian"
+  } 
+```
