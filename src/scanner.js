@@ -92,11 +92,15 @@ function findMatchesInFile(content, rules) {
 }
 
 async function run({ configPath = null, staged = false, verbose = false } = {}) {
+  const startTime = process.hrtime.bigint();
+  const startMem = process.memoryUsage().heapUsed;
+
   const config = loadConfig(configPath);
   const rules = config.rules || [];
   const files = listFiles({ staged, ignoreFiles: config.ignoreFiles });
 
   const findings = [];
+  let filesScanned = 0;
   for (const file of files) {
     // small optimization: skip binary-ish files by extension
     const ext = path.extname(file).toLowerCase();
@@ -109,6 +113,7 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
       if (verbose) console.warn('skip file', file, err.message);
       continue;
     }
+    filesScanned++;
     const fileFindings = findMatchesInFile(content, rules);
     if (fileFindings.length > 0) {
       findings.push({ file, matches: fileFindings });
@@ -127,6 +132,15 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
       }
     }
   }
+
+  const endTime = process.hrtime.bigint();
+  const endMem = process.memoryUsage().heapUsed;
+  const durationMs = Number(endTime - startTime) / 1e6;
+  const memMB = (endMem - startMem) / 1024 / 1024;
+  console.log(chalk.cyanBright(`\nScan stats:`));
+  console.log(chalk.cyan(`  Files scanned: ${filesScanned}`));
+  console.log(chalk.cyan(`  Time taken: ${durationMs.toFixed(1)} ms`));
+  console.log(chalk.cyan(`  Memory used: ${memMB.toFixed(2)} MB`));
 
   return { findings };
 }
