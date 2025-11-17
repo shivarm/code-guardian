@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import fg from 'fast-glob';
 import ignore from 'ignore';
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
 import chalk from 'chalk';
  
 
