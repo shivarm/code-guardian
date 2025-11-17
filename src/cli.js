@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import path from 'path';
+import path from 'node:path';
 import scanner from './scanner.js';
 import chalk from 'chalk';
 
