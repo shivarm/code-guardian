@@ -108,6 +108,7 @@ When run with `--ci` the CLI exits with a non-zero code if any findings are dete
 - Staged-file scanning: run only what will be committed (fast pre-commit checks).
 - Husky integration: optional pre-commit hooks to block commits locally.
 - CI-ready: `--ci` mode for failing pipelines on findings.
+- Unused JS/TS module detection: Each scan, CodeGuardian will warn about JavaScript and TypeScript files that are not imported or required by any other file (excluding entry points like `index.js`, `main.ts`, etc.). These warnings help you clean up unused code, but do not block CI or fail the scan.
 
 
 ## CLI options

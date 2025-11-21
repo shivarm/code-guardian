@@ -4,7 +4,7 @@ import fg from 'fast-glob';
 import ignore from 'ignore';
 import { execSync } from 'node:child_process';
 import chalk from 'chalk';
- 
+import { findUnusedModules } from './unusedModuleDetector.js';
 
 const DEFAULT_CONFIG_FILES = ['.codeguardianrc.json', 'codeguardian.config.json'];
 
@@ -101,6 +101,11 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
 
   const findings = [];
   let filesScanned = 0;
+  // For unused module detection
+  const jsTsFiles = [];
+  const importMap = new Map(); // file -> [imported files]
+  const allFilesSet = new Set();
+
   for (const file of files) {
     // small optimization: skip binary-ish files by extension
     const ext = path.extname(file).toLowerCase();
@@ -118,6 +123,76 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
     if (fileFindings.length > 0) {
       findings.push({ file, matches: fileFindings });
     }
+
+    // Collect JS/TS files for unused module detection and unused import detection
+    if ([".js", ".ts"].includes(ext) && !file.includes(".test") && !file.includes("spec") && !file.includes("config") && !file.includes("setup")) {
+      jsTsFiles.push(file);
+      allFilesSet.add(path.resolve(file));
+      // Parse imports/requires
+      const imports = [];
+      // ES imports (capture imported identifiers)
+      const esImportRegex = /import\s+((?:[\w*{},\s]+)?)\s*from\s*["']([^"']+)["']/g;
+      let match;
+      const importDetails = [];
+      while ((match = esImportRegex.exec(content))) {
+        const imported = match[1].trim();
+        const source = match[2];
+        // Parse imported identifiers
+        let identifiers = [];
+        if (imported.startsWith("* as ")) {
+          identifiers.push(imported.replace("* as ", "").trim());
+        } else if (imported.startsWith("{")) {
+          // Named imports
+          identifiers = imported.replace(/[{}]/g, "").split(",").map(s => s.trim().split(" as ")[0]).filter(Boolean);
+        } else if (imported) {
+          identifiers.push(imported.split(",")[0].trim());
+        }
+        importDetails.push({ source, identifiers });
+        imports.push(source);
+      }
+      // CommonJS requires (variable assignment)
+      const requireVarRegex = /(?:const|let|var)\s+([\w{}*,\s]+)\s*=\s*require\(["']([^"']+)["']\)/g;
+      while ((match = requireVarRegex.exec(content))) {
+        const imported = match[1].trim();
+        const source = match[2];
+        let identifiers = [];
+        if (imported.startsWith("{")) {
+          identifiers = imported.replace(/[{}]/g, "").split(",").map(s => s.trim());
+        } else if (imported) {
+          identifiers.push(imported.split(",")[0].trim());
+        }
+        importDetails.push({ source, identifiers });
+        imports.push(source);
+      }
+      // Bare require (no variable assignment)
+      const requireRegex = /require\(["']([^"']+)["']\)/g;
+      while ((match = requireRegex.exec(content))) {
+        imports.push(match[1]);
+      }
+      importMap.set(path.resolve(file), imports);
+      // Unused import detection
+      // For each imported identifier, check if it's used in the file
+      const unusedImports = [];
+      for (const imp of importDetails) {
+        for (const id of imp.identifiers) {
+          // Simple usage check: look for identifier in code (excluding import line)
+          const usageRegex = new RegExp(`\\b${id.replace(/[$()*+.?^{}|\\]/g, "\\$&")}\\b`, "g");
+          // Remove import lines
+          const codeWithoutImports = content.replace(esImportRegex, "").replace(requireVarRegex, "");
+          const usageCount = (codeWithoutImports.match(usageRegex) || []).length;
+          if (usageCount === 0) {
+            unusedImports.push(id);
+          }
+        }
+      }
+      if (unusedImports.length > 0) {
+        console.log(chalk.yellowBright(`\nWarning: Unused imports in ${file}:`));
+        for (const id of unusedImports) {
+          console.log(chalk.yellow(`  ${id}`));
+        }
+        console.log(chalk.gray('These imports are present but never used in this file.'));
+      }
+    }
   }
 
   // Print nice output
@@ -131,6 +206,16 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
         console.log(`  ${chalk.magenta('Rule:')} ${m.rule} ${chalk.gray(`(line ${m.lineNumber})`)}\n    ${chalk.red(m.line)}`);
       }
     }
+  }
+
+  // Unused JS/TS module detection (warn only)
+  const unused = findUnusedModules(jsTsFiles, importMap);
+  if (unused.length > 0) {
+    console.log(chalk.yellowBright(`\nWarning: Unused modules detected (not imported by any other file):`));
+    for (const f of unused) {
+      console.log(chalk.yellow(`  ${f}`));
+    }
+    console.log(chalk.gray('These files are not blocking CI, but consider cleaning up unused modules.'));
   }
 
   const endTime = process.hrtime.bigint();
