@@ -3,7 +3,7 @@ import path from 'node:path';
 import fg from 'fast-glob';
 import ignore from 'ignore';
 import { execSync } from 'node:child_process';
-import chalk from 'chalk';
+import { styleText } from 'node:util';
 import { findUnusedModules } from './unusedModuleDetector.js';
 
 const DEFAULT_CONFIG_FILES = ['.codeguardianrc.json', 'codeguardian.config.json'];
@@ -186,24 +186,24 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
         }
       }
       if (unusedImports.length > 0) {
-        console.log(chalk.yellowBright(`\nWarning: Unused imports in ${file}:`));
+        console.log(styleText('yellow', `\nWarning: Unused imports in ${file}:`));
         for (const id of unusedImports) {
-          console.log(chalk.yellow(`  ${id}`));
+          console.log(styleText('yellow', `  ${id}`));
         }
-        console.log(chalk.gray('These imports are present but never used in this file.'));
+        console.log(styleText('gray', 'These imports are present but never used in this file.'));
       }
     }
   }
 
   // Print nice output
   if (findings.length === 0) {
-    console.log(chalk.green('Scan successful but no secrets found in.', process.cwd()));
+    console.log(styleText('green', 'Scan successful but no secrets found in.', process.cwd()));
   } else {
-    console.log(chalk.red(`Found ${findings.length} file(s) with potential secrets:`));
+    console.log(styleText('red', `Found ${findings.length} file(s) with potential secrets:`));
     for (const f of findings) {
-      console.log(chalk.yellow(`\nFile: ${f.file}`));
+      console.log(styleText('yellow', `\nFile: ${f.file}`));
       for (const m of f.matches) {
-        console.log(`  ${chalk.magenta('Rule:')} ${m.rule} ${chalk.gray(`(line ${m.lineNumber})`)}\n    ${chalk.red(m.line)}`);
+        console.log(`  ${styleText('magenta','Rule:')} ${m.rule} ${styleText('gray', `(line ${m.lineNumber})`)}\n    ${styleText('red', m.line)}`);
       }
     }
   }
@@ -211,21 +211,21 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
   // Unused JS/TS module detection (warn only)
   const unused = findUnusedModules(jsTsFiles, importMap);
   if (unused.length > 0) {
-    console.log(chalk.yellowBright(`\nWarning: Unused modules detected (not imported by any other file):`));
+    console.log(styleText('yellowBright', `\nWarning: Unused modules detected (not imported by any other file):`));
     for (const f of unused) {
-      console.log(chalk.yellow(`  ${f}`));
+      console.log(styleText('yellow', `  ${f}`));
     }
-    console.log(chalk.gray('These files are not blocking CI, but consider cleaning up unused modules.'));
+    console.log(styleText('gray', 'These files are not blocking CI, but consider cleaning up unused modules.'));
   }
 
   const endTime = process.hrtime.bigint();
   const endMem = process.memoryUsage().heapUsed;
   const durationMs = Number(endTime - startTime) / 1e6;
   const memMB = (endMem - startMem) / 1024 / 1024;
-  console.log(chalk.cyanBright(`\nScan stats:`));
-  console.log(chalk.cyan(`  Files scanned: ${filesScanned}`));
-  console.log(chalk.cyan(`  Time taken: ${durationMs.toFixed(1)} ms`));
-  console.log(chalk.cyan(`  Memory used: ${memMB.toFixed(2)} MB`));
+  console.log(styleText('cyanBright', `\nScan stats:`));
+  console.log(styleText('cyan', `  Files scanned: ${filesScanned}`));
+  console.log(styleText('cyan', `  Time taken: ${durationMs.toFixed(1)} ms`));
+  console.log(styleText('cyan', `  Memory used: ${memMB.toFixed(2)} MB`));
 
   return { findings };
 }

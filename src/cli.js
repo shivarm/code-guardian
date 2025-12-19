@@ -3,7 +3,7 @@
 import { Command } from 'commander';
 import path from 'node:path';
 import scanner from './scanner.js';
-import chalk from 'chalk';
+import { styleText } from 'node:util';
 
 const program = new Command();
 program
@@ -22,7 +22,7 @@ const logo = `
 
 `;
 
-console.log(chalk.magenta(logo));
+console.log(styleText('magenta', logo));
 
 (async () => {
   const opts = program.opts();
