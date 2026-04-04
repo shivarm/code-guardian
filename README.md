@@ -14,6 +14,10 @@
 
 Lightweight CLI to scan repositories for accidentally committed secrets (API keys, tokens, private keys). This short guide starts with how to use CodeGuardian in your project, how to integrate it into CI, and then explains the feature and configuration.
 
+<div align="center">
+<img width="1240" height="752" alt="image" src="https://github.com/user-attachments/assets/b28f515e-8402-471b-ad82-21df4fb63aea" />
+</div>
+
 ## How developers use CodeGuardian.
 
 ---
@@ -30,20 +34,6 @@ npx @shivam-sharma/codeguardian
 
 ```bash
 npm install --save-dev @shivam-sharma/codeguardian
-```
-
-Basic commands:
-
-- Scan entire repository:
-
-```bash
-npx codeguardian
-```
-
-- Scan only staged files (fast; good for pre-commit hooks):
-
-```bash
-npx codeguardian --staged
 ```
 
 ## Default config:
