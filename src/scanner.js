@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import fg from 'fast-glob';
 import ignore from 'ignore';
 import { execSync } from 'node:child_process';
@@ -10,20 +11,21 @@ const DEFAULT_CONFIG_FILES = ['.codeguardianrc.json', 'codeguardian.config.json'
 
 function loadDefaultConfig() {
   const defaultConfigUrl = new URL('../default-config.json', import.meta.url);
-  const content = fs.readFileSync(defaultConfigUrl, 'utf8');
+  const defaultConfigPath = fileURLToPath(defaultConfigUrl);
+  const content = fs.readFileSync(defaultConfigPath, { encoding: 'utf8' });
   return JSON.parse(content);
 }
 
 function loadConfig(configPath) {
   if (configPath) {
     if (!fs.existsSync(configPath)) throw new Error('Config file not found: ' + configPath);
-    return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    return JSON.parse(fs.readFileSync(configPath, { encoding: 'utf8' }));
   }
 
   // try default files
   for (const f of DEFAULT_CONFIG_FILES) {
     const p = path.resolve(process.cwd(), f);
-    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, 'utf8'));
+    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, { encoding: 'utf8' }));
   }
 
   // fallback to embedded defaults
@@ -34,7 +36,7 @@ function readGitignore() {
   const gitignorePath = path.resolve(process.cwd(), '.gitignore');
   const ig = ignore();
   if (fs.existsSync(gitignorePath)) {
-    const content = fs.readFileSync(gitignorePath, 'utf8');
+    const content = fs.readFileSync(gitignorePath, { encoding: 'utf8' });
     ig.add(content);
   }
   // always these file by default
@@ -113,7 +115,7 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
     if (skipExt.includes(ext)) continue;
     let content;
     try {
-      content = fs.readFileSync(file, 'utf8');
+      content = fs.readFileSync(file, { encoding: 'utf8' });
     } catch (err) {
       if (verbose) console.warn('skip file', file, err.message);
       continue;
@@ -197,7 +199,7 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
 
   // Print nice output
   if (findings.length === 0) {
-    console.log(styleText('green', 'Scan successful but no secrets found in.', process.cwd()));
+    console.log(styleText('green', `Scan successful but no secrets found in ${process.cwd()}.`));
   } else {
     console.log(styleText('red', `Found ${findings.length} file(s) with potential secrets:`));
     for (const f of findings) {
