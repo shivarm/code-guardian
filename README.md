@@ -82,7 +82,7 @@ jobs:
         run: npm install
 
       - name: Run CodeGuardian scanner (CI mode)
-        run: npx codeguardian --ci
+        run: @shivam-sharma/codeguardian --ci
 ```
 
 When run with `--ci` the CLI exits with a non-zero code if any findings are detected — this will fail the job and block merges until issues are resolved.

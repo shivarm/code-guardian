@@ -1,6 +1,6 @@
 {
   "name": "@shivam-sharma/codeguardian",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "description": "CLI to scan repos for sensitive secrets before pushing",
   "main": "src/index.js",
   "type": "module",
