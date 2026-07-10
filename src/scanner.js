@@ -211,7 +211,7 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
   }
 
   // Unused JS/TS module detection (warn only)
-  const unused = findUnusedModules(jsTsFiles, importMap);
+  const unused = await findUnusedModules(jsTsFiles, importMap);
   if (unused.length > 0) {
     console.log(styleText('yellowBright', `\nWarning: Unused modules detected (not imported by any other file):`));
     for (const f of unused) {
