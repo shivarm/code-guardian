@@ -6,6 +6,7 @@ import ignore from 'ignore';
 import { execSync } from 'node:child_process';
 import { styleText } from 'node:util';
 import { findUnusedModules } from './unusedModuleDetector.js';
+import { matchWithTimeout } from './safeRegex.js';
 
 const DEFAULT_CONFIG_FILES = ['.codeguardianrc.json', 'codeguardian.config.json'];
 
@@ -70,22 +71,14 @@ function listFiles({ staged, ignoreFiles } = {}) {
   return entries.filter(e => !ig.ignores(e));
 }
 
-function findMatchesInFile(content, rules) {
+async function findMatchesInFile(content, rules) {
   const lines = content.split(/\r?\n/);
   const findings = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     for (const rule of rules) {
-      let flags = 'g';
-      if (rule.flags) flags = rule.flags;
-      let regex;
-      try {
-        regex = new RegExp(rule.pattern, flags);
-      } catch (err) {
-        // invalid regex, skip
-        continue;
-      }
-      if (regex.test(line)) {
+      const isMatch = await matchWithTimeout(line, rule, 50);
+      if (isMatch) {
         findings.push({ rule: rule.name || 'unnamed', lineNumber: i + 1, line: line.trim(), pattern: rule.pattern });
       }
     }
@@ -121,7 +114,7 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
       continue;
     }
     filesScanned++;
-    const fileFindings = findMatchesInFile(content, rules);
+    const fileFindings = await findMatchesInFile(content, rules);
     if (fileFindings.length > 0) {
       findings.push({ file, matches: fileFindings });
     }
