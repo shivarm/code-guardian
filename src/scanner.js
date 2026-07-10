@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fg from 'fast-glob';
 import ignore from 'ignore';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { styleText } from 'node:util';
 import { findUnusedModules } from './unusedModuleDetector.js';
 import { matchWithTimeout } from './safeRegex.js';
@@ -55,16 +55,24 @@ function listFiles({ staged, ignoreFiles } = {}) {
     ig.add(ignoreFiles);
   }
 
-  if (staged) {
-    // Use git to list staged files
-    try {
-      const out = execSync('git diff --name-only --staged', { encoding: 'utf8' });
-      const files = out.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      return files.filter(f => fs.existsSync(f) && !ig.ignores(f));
-    } catch (err) {
-      throw new Error('Failed to get staged files. Are you in a git repo?');
-    }
-  }
+   if (staged) {
+     try {
+       // Bypasses system shell parsing entirely, preventing binary injection hooks
+       const out = execFileSync("git", ["diff", "--name-only", "--staged"], {
+         encoding: "utf8",
+         shell: false,
+         windowsHide: true,
+         timeout: 5000, // Prevents the tool from hanging if a Git process gets locked
+       });
+       const files = out
+         .split(/\r?\n/)
+         .map((s) => s.trim())
+         .filter(Boolean);
+       return files.filter((f) => fs.existsSync(f) && !ig.ignores(f));
+     } catch (err) {
+       throw new Error("Failed to get staged files securely. Are you in a git repo?");
+     }
+   }
 
   // otherwise use fast-glob across repo files (text files)
   const entries = fg.sync(['**/*.*', '**/*'], { dot: true, onlyFiles: true, ignore: ['**/node_modules/**', '**/.git/**'] });
