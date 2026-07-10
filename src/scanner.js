@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fg from 'fast-glob';
 import ignore from 'ignore';
-import { execSync, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { styleText } from 'node:util';
 import { findUnusedModules } from './unusedModuleDetector.js';
 import { matchWithTimeout } from './safeRegex.js';
