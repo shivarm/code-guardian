@@ -226,8 +226,6 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
   const durationMs = Number(endTime - startTime) / 1e6;
   const memMB = (endMem - startMem) / 1024 / 1024;
   console.log(styleText('cyan', ` Files scanned: ${filesScanned} Time taken: ${durationMs.toFixed(1)}ms Memory used: ${memMB.toFixed(2)}MB`));
-  // console.log(styleText('cyan', `  Time taken: ${durationMs.toFixed(1)} ms`));
-  // console.log(styleText('cyan', `  Memory used: ${memMB.toFixed(2)} MB`));
 
   return { findings };
 }
