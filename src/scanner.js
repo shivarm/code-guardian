@@ -200,7 +200,7 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
 
   // Print nice output
   if (findings.length === 0) {
-    console.log(styleText('green', `Scan successful but no secrets found in ${process.cwd()}.`));
+    console.log(styleText('green', ` Scan successful but no secrets found in ${process.cwd()}.`));
   } else {
     console.log(styleText('red', `Found ${findings.length} file(s) with potential secrets:`));
     for (const f of findings) {
@@ -225,10 +225,9 @@ async function run({ configPath = null, staged = false, verbose = false } = {}) 
   const endMem = process.memoryUsage().heapUsed;
   const durationMs = Number(endTime - startTime) / 1e6;
   const memMB = (endMem - startMem) / 1024 / 1024;
-  console.log(styleText('cyanBright', `\nScan stats:`));
-  console.log(styleText('cyan', `  Files scanned: ${filesScanned}`));
-  console.log(styleText('cyan', `  Time taken: ${durationMs.toFixed(1)} ms`));
-  console.log(styleText('cyan', `  Memory used: ${memMB.toFixed(2)} MB`));
+  console.log(styleText('cyan', ` Files scanned: ${filesScanned} Time taken: ${durationMs.toFixed(1)}ms Memory used: ${memMB.toFixed(2)}MB`));
+  // console.log(styleText('cyan', `  Time taken: ${durationMs.toFixed(1)} ms`));
+  // console.log(styleText('cyan', `  Memory used: ${memMB.toFixed(2)} MB`));
 
   return { findings };
 }
